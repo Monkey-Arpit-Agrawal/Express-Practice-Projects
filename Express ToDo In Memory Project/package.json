@@ -1,0 +1,15 @@
+{
+  "name": "express-todo-in-memory-project",
+  "version": "1.0.0",
+  "description": "In-Memory Todo App using Express.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
