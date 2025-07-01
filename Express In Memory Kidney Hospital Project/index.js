@@ -12,3 +12,39 @@
 
 /* In Memory Kidney Hospital */
 
+const express = require('express') ;
+const app = express() ;
+
+let user = {
+    Name : "John" ,
+    kidneys : [
+        {
+            Status : 'Healthy'
+        } , 
+        {
+            Status : 'Unhealthy'
+        }
+    ]
+} 
+
+let users = [user] ;
+
+app.get('/' , function (req , res ) {
+    
+    let totalNumberOfKidneys = users[0].kidneys.length ;
+    let totalNumberOFfHealthyKidneys = (users[0].kidneys.filter((kidney) => (kidney.Status === 'Healthy'))).length ;
+    let totalNumberOfUnhealthyKidneys = totalNumberOfKidneys - totalNumberOFfHealthyKidneys ;
+
+    res.status(200).json({
+        "Total Kidneys : " : totalNumberOfKidneys ,
+        "Healthy Kidneys : " : totalNumberOFfHealthyKidneys ,
+        "Unhealthy Kidneys : " : totalNumberOfUnhealthyKidneys
+    })
+
+}) ;
+
+
+
+app.listen( 3000 , () => {
+    console.log(`Server is running on the Port : ${3000}`) ;
+}) ;
