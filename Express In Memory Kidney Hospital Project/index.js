@@ -29,6 +29,8 @@ let user = {
 
 let users = [user] ;
 
+app.use(express.json()) ;
+
 app.get('/' , function (req , res ) {
     
     let totalNumberOfKidneys = users[0].kidneys.length ;
@@ -43,7 +45,18 @@ app.get('/' , function (req , res ) {
 
 }) ;
 
+app.post('/' , function (req , res) {
+    
+    let statusOfKidney = req.body.status ;
 
+    let newKidney = {Status : statusOfKidney} ;
+    users[0].kidneys.push(newKidney) ;
+
+    res.status(200).send(
+        "Kidney Added Successfully"
+    ) ;
+
+}) ;
 
 app.listen( 3000 , () => {
     console.log(`Server is running on the Port : ${3000}`) ;
