@@ -4,8 +4,8 @@
 // 3. PUT - User can replace all kidneys and make them healthy
 // 4. DELETE - User can remove all the unhealthy kidneys
 
-// 1. What should happen if they try to delete when there are no kidneys?
-// 2. What should happen if they try to make a kidney healthy when all are already healthy
+// 1. What should happen if they try to delete when there are no unhealthy kidneys ?
+// 2. What should happen if they try to make a kidney healthy when all are already healthy ?
 
 // Assume There is only a single user John
 
@@ -28,6 +28,18 @@ let user = {
 } 
 
 let users = [user] ;
+
+function isValid() {
+    
+    let unhealthyKidney = (users[0].kidneys.filter((kidney) => (kidney.Status == "Unhealthy"))).length ;
+
+    if (unhealthyKidney > 0) {
+        return true ;
+    } else {
+        return false ;
+    }
+
+}
 
 app.use(express.json()) ;
 
@@ -60,10 +72,38 @@ app.post('/' , function (req , res) {
 
 app.put('/' , function (req,res){
 
-    users[0].kidneys.forEach((kidney) => (kidney.Status = 'Healthy')) ;
+    let validity = isValid() ;
 
-    res.status(200).send('Updated The Kidneys Successfully') ;
+    if (validity) {
+        
+        users[0].kidneys.forEach((kidney) => (kidney.Status = 'Healthy')) ;
+
+        res.status(200).send('Updated The Kidneys Successfully') ;
+    } else {
+        res.status(400).send('No Unhealthy Kidneys') ;
+    }
+
 }) ;
+
+app.delete('/' , function (req , res) {
+
+    let validity = isValid() ;
+
+    if (validity) {
+        users[0].kidneys.forEach((kidney,index) => {
+            if (kidney.Status == 'Unhealthy'){
+                users[0].kidneys.splice(index,1) ;
+            }
+        })
+
+        res.status(200).send('Done Deletion') ;
+
+    } else {
+        res.status(400).send('No Unhealthy Kidneys') ;
+    }
+    
+}) ;
+
 
 app.listen( 3000 , () => {
     console.log(`Server is running on the Port : ${3000}`) ;
