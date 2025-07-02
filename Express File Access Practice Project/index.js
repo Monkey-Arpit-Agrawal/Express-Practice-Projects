@@ -12,3 +12,34 @@
     - For any other route not defined in the server return 404
  */
 
+const express = require('express') ;
+const app = express() ;
+
+const fs = require('fs') ;
+const path = require('path') ;
+
+app.get('/files' , function (req,res) {
+    fs.readdir(path.join(__dirname,'/files') , 'utf-8',(err , result) => {
+        if (err) {
+            res.send(500).json({
+                'Message' : 'Error In Reading The Directory'
+            })
+        } else {
+            res.status(200).json({
+                Files : result
+            })
+        }
+    })
+})
+
+app.get('/files/:filename' , function (req , res) {
+    
+    let filename = req.params.filename ;
+    
+    fs.readFile()
+
+})
+
+app.listen(3000 , () => {
+    console.log('Server is running on the Port : 3000') ;
+}) ;
