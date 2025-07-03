@@ -34,10 +34,122 @@
 const express = require('express') ;
 const app = express() ;
 
+const path = require('path') ;
+
+const fs = require('fs') ;
+
+function parseTodo (result) {
+    try {
+        let data = JSON.parse(result) ;
+        if (Array.isArray(data)) {
+            return data ;
+        } else {
+            return [] ;
+        }
+    } catch (error) {
+        return [] ;
+    }
+}
+
 app.use(express.json()) ;
 
 app.get('/' , function (req,res) {
     res.status(200).sendFile(path.join(__dirname,'index.html')) ;
+}) ;
+
+app.get('/todos' , function (req,res) {
+    
+    fs.readFile(path.join(__dirname,'./todos.json' ), 'utf-8' , (err,result) => {
+        if (err) {
+            console.log(err);
+            
+            res.status(500).send('Error in reading the file . Try Again') ; 
+
+        } else {
+            let todoArray = parseTodo(result) ;
+
+            if (todoArray.length == 0) {
+                res.status(404).send('Todo List Is Empty') ;
+            } else {
+                res.status(200).json({
+                    'ToDo List' : todoArray
+                })
+            }
+        }
+    })
+
+}) ;
+
+app.get('/todos/:id' , function (req,res){
+
+    let todoId = parseInt(req.params.id) ;
+
+    fs.readFile(path.join(__dirname,'./todos.json' ), 'utf-8' , (err,result) => {
+        if (err) {
+            res.status(500).send('Error in reading the file . Try Again') ;
+        } else {
+            let todoArray = parseTodo(result) ;
+
+            if (todoArray.length == 0) {
+                res.status(404).send('Todo List Is Empty') ;
+            } else {
+                let todoExists = todoArray.findIndex((todo) => (todo.Id == todoId)) ;
+                
+                if (todoExists == -1) {
+                    res.status(404).send('Todo Does Not Exists For The Given ID') ;
+                } else {
+                    res.status(200).json({
+                        'ToDo' : todoArray[todoExists]
+                    })
+                }
+            }
+
+        }
+    })
+
+}) ;
+
+app.post('/todos' , function (req , res){
+
+    let todoTitle = req.body.title ;
+    let todoDescription = req.body.description ;
+    let todoCompleted = req.body.completed ;
+
+    fs.readFile(path.join(__dirname,'./todos.json' ), 'utf-8' , (err,result) => {
+        if (err) {
+            res.status(500).send('Error in reading the file . Try Again') ;
+        } else {
+            let todoArray = parseTodo(result) ;
+
+            let todoId = 0 ;
+
+            if (todoArray.length != 0) {
+                todoId = todoArray[todoArray.length - 1].Id ;
+            }
+
+            let newTodo = {
+                "Id" : todoId + 1 ,
+                "Title" : todoTitle ,
+                "Description" : todoDescription ,
+                "Completed" : todoCompleted
+            }
+
+            todoArray.push(newTodo) ;
+
+            fs.writeFile(path.join(__dirname,'./todos.json' ),JSON.stringify(todoArray,null,2),(err) => {
+                if (err) {
+                    res.status(500).send("Error Occurred . Please Try Again") ;
+                } else {
+                    res.status(200).json({
+                        'Message' : 'ToDo Added Successfully' , 
+                        'Id' : todoId + 1
+                    })
+                }
+            })
+
+        }
+    })
+
 }) ;
 
 app.listen(3000 , () => {
