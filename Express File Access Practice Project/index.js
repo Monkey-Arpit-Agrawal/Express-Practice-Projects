@@ -12,3 +12,74 @@
     - For any other route not defined in the server return 404
  */
 
+const express = require('express') ;
+const app = express() ;
+
+const fs = require('fs') ;
+
+const path = require('path') ;
+
+app.get('/',function (req,res) {
+    res.status(200).sendFile(path.join(__dirname,'index.html')); 
+}) ;
+
+app.get('/files', function (req,res){
+    fs.readdir(path.join(__dirname,"files") , 'utf-8' , (err,result) => {
+        if (err) {
+            res.status(500).send('Error In Reading The Directory') ;
+        } else {
+            res.status(200).json({
+                'File List' : result
+            })
+        }
+    })
+}) ;
+
+Approach - 1
+app.get('/files/:filename' , function (req , res) {
+    
+    let filename = req.params.filename ;
+
+    fs.readFile(path.join(__dirname,'files',filename) , 'utf-8' , (err,result) => {
+        if (err) {
+            res.status(404).json({
+                'Message' : 'File Not Found'
+            })
+        } else {
+            res.status(200).json({
+                'File Content' : result
+            })
+        }
+    }) ;
+}) ;
+
+// Approach - 2 Weak Approach But OK
+// app.get('/files/:filename' , function (req , res) {
+    
+//     let filename = req.params.filename ;
+
+//     fs.readdir(path.join(__dirname,'files') , 'utf-8' , (err,result) => {
+//         if (err) {
+//             res.status(500).json({
+//                 'Message' : 'Server Error'
+//             })
+//         } else {
+//             let fileExists = result.includes(filename) ;
+//             if (fileExists) {
+//                 res.status(200).json({
+//                     'File' : 'File Found'
+//                 })
+//             } else {
+//                 res.status(404).send('File Not Found')
+//             }
+//         }
+//     }) ;
+// }) ;
+
+app.use((req,res) => {
+    res.status(404).send('Invalid URL') ;
+}) ;
+
+app.listen(3000 , () => {
+    console.log('App is running on the Port : 3000') ;
+}) ;
