@@ -152,6 +152,92 @@ app.post('/todos' , function (req , res){
 
 }) ;
 
+app.put('/todos/:id' , function (req,res) {
+    
+    let todoId = parseInt(req.params.id) ;
+
+    let todoTitle = req.body.title ;
+    let todoDescription = req.body.description ;
+    let todoCompleted = req.body.completed ;
+
+    fs.readFile(path.join(__dirname,'./todos.json' ), 'utf-8' , (err,result) => {
+        if (err) {
+            res.status(500).send('Error in reading the file . Try Again') ;
+        } else {
+            let todoArray = parseTodo(result) ;
+
+            if (todoArray.length == 0) {
+                res.status(404).send('Todo List Is Empty') ;
+            } else {
+
+                let todoExists = todoArray.findIndex((todo) => (todo.Id == todoId)) ;
+
+                if (todoExists == -1) {
+                    res.status(404).send('Todo Does Not Exists For The Given ID') ;
+                } else {
+                    
+                    todoArray[todoExists].Title = todoTitle ?? todoArray[todoExists].Title ;
+                    todoArray[todoExists].Description = todoDescription ?? todoArray[todoExists].Description ;
+                    todoArray[todoExists].Completed = todoCompleted ?? todoArray[todoExists].Completed ;
+
+                    fs.writeFile(path.join(__dirname,'./todos.json' ),JSON.stringify(todoArray,null,2),(err) => {
+                        if (err) {
+                            res.status(500).send("Error Occurred . Please Try Again") ;
+                        } else {
+                            res.status(200).json({
+                                "Message" : "ToDo Updated Successfully" ,
+                                "ToDo" : todoArray[todoExists]
+                            })
+                        }
+                    })
+                }
+            }
+        }
+    })
+}) ;
+
+app.delete('/todos/:id' , function (req,res) {
+    
+    let todoId = parseInt(req.params.id) ;
+
+    fs.readFile(path.join(__dirname,'./todos.json' ), 'utf-8' , (err,result) => {
+        if (err) {
+            res.status(500).send('Error in reading the file . Try Again') ;
+        } else {
+            let todoArray = parseTodo(result) ;
+
+            if (todoArray.length == 0) {
+                res.status(404).send('Todo List Is Empty') ;
+            } else {
+
+                let todoExists = todoArray.findIndex((todo) => (todo.Id == todoId)) ;
+
+                if (todoExists == -1) {
+                    res.status(404).send('Todo Does Not Exists For The Given ID') ;
+                } else {
+                    
+                    todoArray.splice(todoExists,1) ;
+
+                    fs.writeFile(path.join(__dirname,'./todos.json' ),JSON.stringify(todoArray,null,2),(err) => {
+                        if (err) {
+                            res.status(500).send("Error Occurred . Please Try Again") ;
+                        } else {
+                            res.status(200).json({
+                                "Message" : "ToDo Deleted Successfully" ,
+                                "ToDo List" : todoArray
+                            })
+                        }
+                    })
+                }
+            }
+        }
+    })
+}) ;
+
+app.use((req , res) => {
+    res.status(404).send('Invalid URL') ;
+}) ;
+
 app.listen(3000 , () => {
     console.log('App is running on the server 3000') ;
 }) ;
