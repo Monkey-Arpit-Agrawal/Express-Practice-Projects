@@ -7,7 +7,7 @@
 // 3. http://localhost:3000/divide?a=1&b=2
 // 4. http://localhost:3000/subtract?a=1&b=2
 
-// Here instead of query parameters use Dynamic Routes
+// Here instead of query parameters use Dynamic
 
 
 const express = require('express') ;
