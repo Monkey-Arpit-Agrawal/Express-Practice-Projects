@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Project</title>
+</head>
+<body>
+    <div id="root">
+
+        <button onclick="result()">Sum</button>
+
+        <script>
+
+            async function result () {
+
+                try {
+                    let response = await fetch('http://localhost:3000/sum?a=66&b=6') ;
+                    let sum = await response.json() ;
+                    console.log(sum) ;
+
+                    document.getElementById('root').innerHTML = sum ;
+                } catch (error) {
+                    console.log('Error Occurred') ;
+                }
+
+            }
+
+
+        </script>
+
+    </div>
+</body>
+</html>
