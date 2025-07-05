@@ -65,17 +65,28 @@ app.post('/signup' , function (req , res) {
     let username = req.body.username ;
     let password = req.body.password ;
 
-    let newUser = {
-        "username" : username ,
-        "password" : password
-    } ;
+    let userExists = users.findIndex((user) => (user.username == username)) ;
 
-    users.push(newUser) ;
+    if (userExists == -1) {
 
-    res.status(200).json({
-        'Message' : 'User Signed Up Successfully'
-    }) ;
+        let newUser = {
+            "username" : username ,
+            "password" : password
+        } ;
 
+        users.push(newUser) ;
+
+        res.status(200).json({
+            'Message' : 'User Signed Up Successfully'
+        }) ;
+
+    } else {
+
+        res.status(404).json({
+            'Message' : 'User By This Username Already Exists'
+        }) ;
+        
+    }
 }) ;
 
 app.post('/signin' , function (req , res) {
