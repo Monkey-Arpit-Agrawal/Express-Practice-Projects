@@ -41,6 +41,25 @@ function generateToken () {
 
 app.use(express.json()) ;
 
+app.get('/me' , function (req , res) {
+    
+    let userSendToken = req.headers["token"] ;
+
+    let authenticatedUser = users.findIndex((user) => user.token === userSendToken) ;
+
+    if (authenticatedUser == -1) {
+        res.status(401).json({
+            'Message' : 'Invalid User'
+        })
+    } else {
+        let info = users[authenticatedUser].username ;
+        res.status(200).json({
+            'Info' : info
+        })
+    }
+
+}) ;
+
 app.post('/signup' , function (req , res) {
     
     let username = req.body.username ;
