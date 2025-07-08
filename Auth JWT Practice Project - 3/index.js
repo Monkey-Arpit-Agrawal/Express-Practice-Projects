@@ -7,6 +7,25 @@ let users = [] ;
 
 let JWT_SECRET = "iLoveShiphaliRana" ;
 
+function auth (req,res,next) {
+    
+    let userSendToken = req.headers['token'] ;
+
+    if (userSendToken) {
+        jwt.verify(userSendToken,JWT_SECRET,(err,result) => {
+            if (err) {
+                res.status(404).send('Invalid Access') ;
+            } else {
+                req.user = result ;
+                next() ;
+            }
+        })
+    } else {
+        res.status(404).send('Unauthorised Access') ;
+    }
+
+}
+
 app.use(express.json()) ;
 
 app.post('/signup' , function (req , res){
@@ -52,31 +71,23 @@ app.post('/signin' , function (req , res){
             'username' : users[userExists].username
         } , JWT_SECRET) ;
 
+        res.header('token',token) ;
+
         res.status(200).json({
-            'Message' : 'Signed In Successfully' , 
-            'token' : token
+            'Message' : 'Signed In Successfully' 
         }) ;
     }
 }) ;
 
-app.get('/me' , function (req,res) {
-    let userSendToken = req.headers['token'] ;
+app.get('/me' ,auth, function (req,res) {
 
-    try {
-        let authenticatedUser = jwt.verify(userSendToken,JWT_SECRET) ;
-        let authenticatedUserUsername = authenticatedUser.username ;
+    let username = req.user.username ;
 
-        let info = users.findIndex((user) => (user.username == authenticatedUserUsername) ) ;
+    let information = users.filter((user) => (user.username == username))[0].password ;
 
-        let information = users[info].username ;
-
-        res.status(200).json({
-            'Information' : information
-        })
-
-    } catch (error) {
-        res.status(404).send('Invalid User') ;
-    }
+    res.status(200).json({
+        'Information' : information
+    })
 }) ;
 
 app.listen(3000 , () => {
